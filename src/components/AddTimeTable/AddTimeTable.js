@@ -1,23 +1,23 @@
-import React, { PureComponent } from 'react';
-import { FormGroup, FormLabel, FormControl } from 'material-ui/Form';
-import { createStyleSheet, withStyles } from 'material-ui/styles';
-import TextField from 'material-ui/TextField';
-import Button from 'material-ui/Button';
-import Typography from 'material-ui/Typography';
-import PropTypes from 'prop-types';
-import ReactTable from 'react-table';
-import 'react-table/react-table.css';
+import React, { PureComponent } from 'react'
+import { FormGroup, FormLabel, FormControl } from 'material-ui/Form'
+import { createStyleSheet, withStyles } from 'material-ui/styles'
+import TextField from 'material-ui/TextField'
+import Button from 'material-ui/Button'
+import Typography from 'material-ui/Typography'
+import PropTypes from 'prop-types'
+import ReactTable from 'react-table'
+import 'react-table/react-table.css'
 
-import './react-table.css';
-import base from '../../re-base';
-import { emptyStarterTimeTable } from '../../constants';
+import './react-table.css'
+import base from '../../re-base'
+import { emptyStarterTimeTable } from '../../constants'
 
 class AddTimeTable extends PureComponent {
   constructor(props, context) {
-    super(props, context);
+    super(props, context)
 
-    this.renderEditable = this.renderEditable.bind(this);
-    this.pushTimeTableInfo = this.pushTimeTableInfo.bind(this);
+    this.renderEditable = this.renderEditable.bind(this)
+    this.pushTimeTableInfo = this.pushTimeTableInfo.bind(this)
 
     this.state = {
       data: emptyStarterTimeTable,
@@ -27,51 +27,56 @@ class AddTimeTable extends PureComponent {
       shift: '',
       teachers: null,
       rooms: null,
-    };
+    }
 
     this.columns = [
       {
-        Header: '1st',
+        Header: '08:00 - 09:00',
         accessor: 'sl1',
         Cell: this.renderEditable,
       },
       {
-        Header: '2nd',
+        Header: '09:00 - 10:00',
         accessor: 'sl2',
         Cell: this.renderEditable,
       },
       {
-        Header: '3rd',
+        Header: '10:00 - 10:15',
         accessor: 'sl3',
         Cell: this.renderEditable,
       },
       {
-        Header: '4th',
+        Header: '10:15 - 12:15',
         accessor: 'sl4',
         Cell: this.renderEditable,
       },
       {
-        Header: '5th',
+        Header: '12:15 - 01:00',
         accessor: 'sl5',
         Cell: this.renderEditable,
       },
       {
-        Header: '6th',
+        Header: '01:00 - 02:00',
+        accessor: 'sl5',
+        Cell: this.renderEditable,
+      },
+      {
+        Header: '02:00 - 03:00',
         accessor: 'sl6',
         Cell: this.renderEditable,
       },
       {
-        Header: '7th',
+        Header: '03:00 - 04:00',
         accessor: 'sl7',
         Cell: this.renderEditable,
       },
-    ];
+    ]
   }
 
   componentWillMount() {
-    const key = this.props.location.pathname.split('/')[2];
+    const key = this.props.location.pathname.split('/')[2]
 
-    this.fetchAllBase();
+    this.fetchAllBase()
 
     base
       .fetch(`timeTables/${key}`, {
@@ -85,30 +90,33 @@ class AddTimeTable extends PureComponent {
             data: data[1],
             shift: data[2],
             semester: data[3],
-          });
+          })
         }
-        this.forceUpdate();
+        this.forceUpdate()
       })
       .catch((error) => {
-        window.console.log(error);
-      });
+        window.console.log(error)
+      })
   }
 
   // the supercomplex func;
   getAvailableOptions = (cellInfo, item) =>
     this.state[item]
-      .map(op => op.name)
-      .map(name =>
-        (this.state.completeteTT
-          .map(timeTable =>
-            timeTable.data[cellInfo.index][cellInfo.column.id][
-              item === 'teachers' ? 1 : 2
-            ])
+      .map((op) => op.name)
+      .map((name) =>
+        this.state.completeteTT
+          .map(
+            (timeTable) =>
+              timeTable.data[cellInfo.index][cellInfo.column.id][
+                item === 'teachers' ? 1 : 2
+              ],
+          )
           .includes(name) ? (
-            <option disabled>{name}</option>
-          ) : (
-            <option>{name}</option>
-          )));
+          <option disabled>{name}</option>
+        ) : (
+          <option>{name}</option>
+        ),
+      )
 
   fetchAllBase = () => {
     base
@@ -117,8 +125,8 @@ class AddTimeTable extends PureComponent {
         asArray: true,
       })
       .then((data) => {
-        this.setState({ completeteTT: data });
-      });
+        this.setState({ completeteTT: data })
+      })
 
     base
       .fetch('teachers', {
@@ -126,8 +134,8 @@ class AddTimeTable extends PureComponent {
         asArray: true,
       })
       .then((data) => {
-        this.setState({ teachers: data });
-      });
+        this.setState({ teachers: data })
+      })
 
     base
       .fetch('rooms', {
@@ -135,29 +143,29 @@ class AddTimeTable extends PureComponent {
         asArray: true,
       })
       .then((data) => {
-        this.setState({ rooms: data });
-      });
-  };
+        this.setState({ rooms: data })
+      })
+  }
 
   pushTimeTableInfo(event) {
-    event.preventDefault();
+    event.preventDefault()
 
-    const self = this;
-    const key = this.props.location.pathname.split('/')[2];
+    const self = this
+    const key = this.props.location.pathname.split('/')[2]
 
-    delete this.state.completeteTT;
-    delete this.state.teachers;
-    delete this.state.rooms;
+    delete this.state.completeteTT
+    delete this.state.teachers
+    delete this.state.rooms
 
     base.post(`timeTables/${key || Date.now()}`, {
       data: this.state,
       then(err) {
         if (!err) {
-          self.timeTableForm.reset();
-          self.props.history.push('/saved');
+          self.timeTableForm.reset()
+          self.props.history.push('/saved')
         }
       },
-    });
+    })
   }
 
   renderEditable(cellInfo) {
@@ -166,9 +174,9 @@ class AddTimeTable extends PureComponent {
         <input
           style={{ backgroundColor: '#fafafa' }}
           onChange={(e) => {
-            const data = [...this.state.data];
-            data[cellInfo.index][cellInfo.column.id][0] = e.target.value;
-            this.setState({ data });
+            const data = [...this.state.data]
+            data[cellInfo.index][cellInfo.column.id][0] = e.target.value
+            this.setState({ data })
           }}
           value={this.state.data[cellInfo.index][cellInfo.column.id][0]}
         />
@@ -179,9 +187,9 @@ class AddTimeTable extends PureComponent {
             this.state.data[cellInfo.index][cellInfo.column.id][1] || 'Not Set'
           }
           onChange={(e) => {
-            const data = [...this.state.data];
-            data[cellInfo.index][cellInfo.column.id][1] = e.target.value;
-            this.setState({ data });
+            const data = [...this.state.data]
+            data[cellInfo.index][cellInfo.column.id][1] = e.target.value
+            this.setState({ data })
           }}
         >
           <option>Not Set</option>
@@ -194,33 +202,31 @@ class AddTimeTable extends PureComponent {
             this.state.data[cellInfo.index][cellInfo.column.id][2] || 'Not Set'
           }
           onChange={(e) => {
-            const data = [...this.state.data];
-            data[cellInfo.index][cellInfo.column.id][2] = e.target.value;
-            this.setState({ data });
+            const data = [...this.state.data]
+            data[cellInfo.index][cellInfo.column.id][2] = e.target.value
+            this.setState({ data })
           }}
         >
           <option>Not Set</option>
           {this.getAvailableOptions(cellInfo, 'rooms')}
         </select>
       </div>
-    );
+    )
   }
 
   render() {
-    const { classes } = this.props;
-    const {
-      data, classInfo, semester, shift,
-    } = this.state;
-    window.console.dir(' Boom!! Render Bomb!!');
+    const { classes } = this.props
+    const { data, classInfo, semester, shift } = this.state
+    window.console.dir(' Boom!! Render Bomb!!')
 
     if (!(this.state.completeteTT && this.state.teachers && this.state.rooms)) {
-      return <div>Loading..</div>;
+      return <div>Loading..</div>
     }
 
     return (
       <form
         onSubmit={this.pushTimeTableInfo}
-        ref={input => (this.timeTableForm = input)}
+        ref={(input) => (this.timeTableForm = input)}
       >
         <div className={classes.form}>
           <FormLabel htmlFor="time-table-info">
@@ -234,7 +240,7 @@ class AddTimeTable extends PureComponent {
                 required
                 id="classInfo"
                 label="ClassInfo"
-                onChange={e => this.setState({ classInfo: e.target.value })}
+                onChange={(e) => this.setState({ classInfo: e.target.value })}
                 className={classes.input}
                 marginForm
                 value={classInfo || ''}
@@ -243,7 +249,7 @@ class AddTimeTable extends PureComponent {
                 required
                 id="semester"
                 label="Semester"
-                onChange={e => this.setState({ semester: e.target.value })}
+                onChange={(e) => this.setState({ semester: e.target.value })}
                 className={classes.input}
                 marginForm
                 value={semester || ''}
@@ -252,7 +258,7 @@ class AddTimeTable extends PureComponent {
                 required
                 id="shift"
                 label="Shift"
-                onChange={e => this.setState({ shift: e.target.value })}
+                onChange={(e) => this.setState({ shift: e.target.value })}
                 className={classes.input}
                 marginForm
                 value={shift || ''}
@@ -273,11 +279,11 @@ class AddTimeTable extends PureComponent {
           <Typography type="button">&nbsp;Save</Typography>
         </Button>
       </form>
-    );
+    )
   }
 }
 
-const styleSheet = createStyleSheet('AddTimeTable', theme => ({
+const styleSheet = createStyleSheet('AddTimeTable', (theme) => ({
   input: {
     margin: theme.spacing.unit,
   },
@@ -287,10 +293,10 @@ const styleSheet = createStyleSheet('AddTimeTable', theme => ({
   button: {
     margin: 25,
   },
-}));
+}))
 
 AddTimeTable.propTypes = {
   classes: PropTypes.object.isRequired,
-};
+}
 
-export default withStyles(styleSheet)(AddTimeTable);
+export default withStyles(styleSheet)(AddTimeTable)
